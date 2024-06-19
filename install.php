@@ -1,0 +1,113 @@
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
+
+use ClarionApp\Installer\EnvEditor;
+
+$BACKEND_DIR = "/home/clarion/backend-framework";
+$FRONTEND_DIR = "/home/clarion/frontend-framework";
+$MAC = get_mac();
+$DB_NAME = "clarion";
+$DB_USER = "clarion";
+$DB_PASS = generate_password(12);
+$DB_HOST = "127.0.0.1";
+$DB_PORT = "3306";
+$MULTICHAIN_VERSION = "2.3.3";
+
+/* Don't edit below this line */
+
+$APT_PACKAGES = "screen git php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql wget tar curl ssh ";
+$APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev libcurl4-openssl-dev libpugixml-dev ";
+$APT_PACKAGES.= "libsystemd-dev vim screen php-cli";
+$HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
+
+print "MAC: $MAC\n";
+print "HOSTNAME: $HOSTNAME\n";
+
+change_hostname($HOSTNAME);
+install_apt_packages($APT_PACKAGES);
+setup_mysql($DB_NAME, $DB_USER, $DB_PASS, $DB_HOST);
+create_laravel_project($BACKEND_DIR);
+configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS);
+
+function get_mac()
+{
+    $lines = explode("\n", shell_exec('ip -o link show'));
+    $func = function($line)
+    {
+        $parts = explode(' ', $line);
+        if(!isset($parts[1])) return null;
+        $iface = str_replace(':', '', $parts[1]);
+        if($iface == 'lo') return null;
+        if(!isset($parts[21])) return null;
+        return $parts[21];
+    };
+
+    $macs = array_values(array_filter(array_map($func, $lines)));
+    return $macs[0];
+}
+
+function generate_password($size)
+{
+    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    $password = "";
+    for($i = 0; $i < $size; $i++) {
+        $password .= $chars[rand(0, strlen($chars) - 1)];
+    }
+    return $password;
+}
+
+function install_apt_packages($packages)
+{
+    shell_exec("apt-get update");
+    shell_exec("apt-get install -y $packages");
+}
+
+function change_hostname($hostname)
+{
+    shell_exec("hostnamectl set-hostname $hostname");
+
+    $hosts = file_get_contents("/etc/hosts");
+    $hosts = preg_replace("/debian/", $hostname, $hosts);
+    file_put_contents("/etc/hosts", $hosts);
+}
+
+function setup_mysql($db_name, $db_user, $db_pass, $db_host)
+{
+    shell_exec("mysql -e \"CREATE DATABASE $db_name\"");
+    shell_exec("mysql -e \"CREATE USER '$db_user'@'$db_host' IDENTIFIED BY '$db_pass'");
+    shell_exec("mysql -e \"GRANT ALL PRIVILEGES ON $db_name.* TO '$db_user'@'$db_host'\"");
+    shell_exec("mysql -e \"FLUSH PRIVILEGES\"");
+}
+
+function create_laravel_project($dir)
+{
+    shell_exec("composer -q create-project --prefer-dist laravel/laravel $dir");
+    $env = new EnvEditor("$dir/.env");
+}
+
+function configure_laravel_project($backend_dir, $db_name, $db_user, $db_pass, $db_host, $db_port)
+{
+    $env = new EnvEditor("$backend_dir/.env");
+    $env->set("DB_CONNECTION", "mysql");
+    $env->set("DB_HOST", $db_host);
+    $env->set("DB_PORT", $db_port);
+    $env->set("DB_DATABASE", $db_name);
+    $env->set("DB_USERNAME", $db_user);
+    $env->set("DB_PASSWORD", $db_pass);
+    $env->save();
+}
+
+function install_multichain($version)
+{
+    $url = "https://www.multichain.com/download/multichain-$version.tar.gz";
+    shell_exec("wget $url");
+    shell_exec("tar -xvzf multichain-$version.tar.gz");
+    
+    if(!file_exists("/home/clarion/bin"))
+    {
+        mkdir("/home/clarion/bin", 0755, true);
+    }
+
+    // Copy multichaind multichain-cli multichain-util to /home/clarion/bin
+    shell_exec("cp multichain-$version/multichaind multichain-$version/multichain-cli multichain-$version/multichain-util /home/clarion/bin");
+}
