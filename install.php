@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
+use Composer\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use ClarionApp\Installer\EnvEditor;
 
 $BACKEND_DIR = "/home/clarion/backend-framework";
@@ -26,6 +29,7 @@ print "HOSTNAME: $HOSTNAME\n";
 change_hostname($HOSTNAME);
 install_apt_packages($APT_PACKAGES);
 setup_mysql($DB_NAME, $DB_USER, $DB_PASS, $DB_HOST);
+git_clone("https://github.com/clarion-app/backend.git", "/home/clarion");
 create_laravel_project($BACKEND_DIR);
 configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS);
 
@@ -81,8 +85,18 @@ function setup_mysql($db_name, $db_user, $db_pass, $db_host)
 
 function create_laravel_project($dir)
 {
-    shell_exec("composer -q create-project --prefer-dist laravel/laravel $dir");
-    $env = new EnvEditor("$dir/.env");
+    runComposerCommand('create-project', ['--prefer-dist', 'laravel/laravel', $dir]);
+    $composerJson = json_decode(file_get_contents("$dir/composer.json"), true);
+    $composerJson['minimum-stability'] = 'dev';
+    $composerJson['repositories'] = [
+        [
+            'type' => 'path',
+            'url' => '../backend'
+        ]
+    ];
+    file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT));
+
+    runComposerCommand('require', ['clarion-app/backend:dev-main'], $dir);
 }
 
 function configure_laravel_project($backend_dir, $db_name, $db_user, $db_pass, $db_host, $db_port)
@@ -110,4 +124,26 @@ function install_multichain($version)
 
     // Copy multichaind multichain-cli multichain-util to /home/clarion/bin
     shell_exec("cp multichain-$version/multichaind multichain-$version/multichain-cli multichain-$version/multichain-util /home/clarion/bin");
+}
+
+function runComposerCommand($command, $arguments = [], $workingDir = null) {
+    $application = new Application();
+    $application->setAutoExit(false);
+
+    // Set the working directory if specified
+    if ($workingDir) {
+        chdir($workingDir);
+    }
+
+    $input = new ArrayInput(array_merge(['command' => $command], $arguments));
+    $output = new BufferedOutput();
+
+    $application->run($input, $output);
+
+    return $output->fetch();
+}
+
+function git_clone($repo, $dir)
+{
+    shell_exec("git clone $repo $dir");
 }

@@ -13,5 +13,7 @@
             "email": "tim@metaverse.systems"
         }
     ],
-    "require": {}
+    "require": {
+        "composer/composer": "^2.7"
+    }
 }
