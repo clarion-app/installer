@@ -97,6 +97,10 @@ function create_laravel_project($dir)
     file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT));
 
     runComposerCommand('require', ['clarion-app/backend:dev-main'], $dir);
+    $pwd = getcwd();
+    chdir($dir);
+    shell_exec("php artisan passport:install --uuids");
+    chdir($pwd);
 }
 
 function configure_laravel_project($backend_dir, $db_name, $db_user, $db_pass, $db_host, $db_port)
