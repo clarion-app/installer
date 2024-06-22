@@ -98,7 +98,7 @@ function setup_mysql($db_name, $db_user, $db_pass, $db_host)
 function create_laravel_project($dir)
 {
     //print runComposerCommand('create-project', ['--prefer-dist', 'laravel/laravel', $dir]);
-    shell_exec("composer create-project --prefer-dist laravel/laravel $dir");
+    shell_exec("composer create-project -q --prefer-dist laravel/laravel $dir");
     print "Editing $dir/composer.json\n";
     $composerJson = json_decode(file_get_contents("$dir/composer.json"), true);
     $composerJson['minimum-stability'] = 'dev';
@@ -110,7 +110,8 @@ function create_laravel_project($dir)
     ];
     file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT));
 
-    runComposerCommand('require', ['clarion-app/backend:dev-main'], $dir);
+    //runComposerCommand('require', ['clarion-app/backend:dev-main'], $dir);
+    shell_exec("composer require clarion-app/backend:dev-main -q --working-dir=$dir");
     $pwd = getcwd();
     chdir($dir);
     shell_exec("php artisan passport:install --uuids");
