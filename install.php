@@ -23,14 +23,26 @@ $APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev l
 $APT_PACKAGES.= "libsystemd-dev vim screen php-cli";
 $HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
 
-print "MAC: $MAC\n";
-print "HOSTNAME: $HOSTNAME\n";
-
+print "Changing hostname to $HOSTNAME\n";
 change_hostname($HOSTNAME);
+
+print "Installing apt packages: $APT_PACKAGES\n";
 install_apt_packages($APT_PACKAGES);
+
+print "Setting up mysql:\n";
+print "DB_NAME=$DB_NAME\n";
+print "DB_USER=$DB_USER\n";
+print "DB_PASS=$DB_PASS\n";
+print "DB_HOST=$DB_HOST\n";
 setup_mysql($DB_NAME, $DB_USER, $DB_PASS, $DB_HOST);
+
+print "Cloning backend repo\n";
 git_clone("https://github.com/clarion-app/backend.git", "/home/clarion");
+
+print "Creating Laravel project in $BACKEND_DIR\n";
 create_laravel_project($BACKEND_DIR);
+
+print "Configuring Laravel\n";
 configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS);
 
 function get_mac()
@@ -78,7 +90,7 @@ function change_hostname($hostname)
 function setup_mysql($db_name, $db_user, $db_pass, $db_host)
 {
     shell_exec("mysql -e \"CREATE DATABASE $db_name\"");
-    shell_exec("mysql -e \"CREATE USER '$db_user'@'$db_host' IDENTIFIED BY '$db_pass'");
+    shell_exec("mysql -e \"CREATE USER '$db_user'@'$db_host' IDENTIFIED BY '$db_pass'\"");
     shell_exec("mysql -e \"GRANT ALL PRIVILEGES ON $db_name.* TO '$db_user'@'$db_host'\"");
     shell_exec("mysql -e \"FLUSH PRIVILEGES\"");
 }
