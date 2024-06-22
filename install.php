@@ -3,7 +3,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use ClarionApp\Installer\EnvEditor;
 
-$BACKEND_DIR = "/home/clarion/backend-framework";
+$BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/home/clarion/frontend-framework";
 $MAC = get_mac();
 $DB_NAME = "clarion";
@@ -116,7 +116,7 @@ function create_laravel_project($dir)
     print "Installing passport\n";
     print shell_exec("php artisan passport:install --uuids");
     chdir($pwd);
-    shell_exec("chown -R clarion:clarion $dir");
+    shell_exec("chown -R www-data:www-data $dir");
 }
 
 function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $db_user, $db_pass)
@@ -151,14 +151,14 @@ function git_clone($repo, $dir)
     shell_exec("git clone $repo $dir");
 }
 
-function configure_apache_backend($backend_dir)
+function configure_apache_backend()
 {
     $apacheConfig = <<<EOF
 <VirtualHost *:8000>
     ServerName clarion-backend
-    DocumentRoot $backend_dir/public
+    DocumentRoot /var/www/backend-framework/public
 
-    <Directory $backend_dir/public>
+    <Directory /var/www/backend-framework/public>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
@@ -173,11 +173,10 @@ EOF;
     shell_exec("a2ensite clarion-backend");
     shell_exec("a2enmod rewrite");
 
-    // Change Apache User and Group to clarion
-    $apacheConf = file_get_contents("/etc/apache2/apache2.conf");
-    $apacheConf = preg_replace("/User www-data/", "User clarion", $apacheConf);
-    $apacheConf = preg_replace("/Group www-data/", "Group clarion", $apacheConf);
-    file_put_contents("/etc/apache2/apache2.conf", $apacheConf);
+    // Add port 8000 to ports.conf
+    $portsConf = file_get_contents("/etc/apache2/ports.conf");
+    $portsConf.= "\nListen 8000\n";
+    file_put_contents("/etc/apache2/ports.conf", $portsConf);
 
     shell_exec("systemctl restart apache2");
 }
