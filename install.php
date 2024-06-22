@@ -57,6 +57,7 @@ $ssdp_conf->networkInterface = $NETWORK_INTERFACE;
 $ssdp_conf->descriptionUrl = "http://$IP:8000/Description.xml";
 file_put_contents("/etc/ssdp-advertiser.json", json_encode($ssdp_conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 shell_exec("systemctl enable ssdp-advertiser");
+shell_exec("systemctl start ssdp-advertiser");
 
 function get_network_interface()
 {
