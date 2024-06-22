@@ -152,8 +152,17 @@ function runComposerCommand($command, $arguments = [], $workingDir = null) {
         chdir($workingDir);
     }
 
-    $input = new ArrayInput(array_merge(['command' => $command], $arguments));
+    $inputArray = array_merge(['command' => $command], $arguments);
+    $input = new ArrayInput($inputArray);
     $output = new BufferedOutput();
+
+    echo "Running command: composer " . implode(' ', $inputArray) . "\n";
+
+    try {
+        $application->run($input, $output);
+    } catch (Exception $e) {
+        echo "Error running command: " . $e->getMessage() . "\n";
+    }
 
     $application->run($input, $output);
 
