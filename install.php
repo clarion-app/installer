@@ -1,9 +1,6 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Composer\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use ClarionApp\Installer\EnvEditor;
 
 $BACKEND_DIR = "/home/clarion/backend-framework";
@@ -97,7 +94,6 @@ function setup_mysql($db_name, $db_user, $db_pass, $db_host)
 
 function create_laravel_project($dir)
 {
-    //print runComposerCommand('create-project', ['--prefer-dist', 'laravel/laravel', $dir]);
     shell_exec("composer create-project -q --prefer-dist laravel/laravel $dir");
     print "Editing $dir/composer.json\n";
     $composerJson = json_decode(file_get_contents("$dir/composer.json"), true);
@@ -110,7 +106,6 @@ function create_laravel_project($dir)
     ];
     file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT));
 
-    //runComposerCommand('require', ['clarion-app/backend:dev-main'], $dir);
     shell_exec("composer require clarion-app/backend:dev-main -q --working-dir=$dir");
     $pwd = getcwd();
     chdir($dir);
@@ -143,32 +138,6 @@ function install_multichain($version)
 
     // Copy multichaind multichain-cli multichain-util to /home/clarion/bin
     shell_exec("cp multichain-$version/multichaind multichain-$version/multichain-cli multichain-$version/multichain-util /home/clarion/bin");
-}
-
-function runComposerCommand($command, $arguments = [], $workingDir = null) {
-    $application = new Application();
-    $application->setAutoExit(false);
-
-    // Set the working directory if specified
-    if ($workingDir) {
-        chdir($workingDir);
-    }
-
-    $inputArray = array_merge(['command' => $command], $arguments);
-    $input = new ArrayInput($inputArray);
-    $output = new BufferedOutput();
-
-    echo "Running command: composer " . implode(' ', $inputArray) . "\n";
-
-    try {
-        $application->run($input, $output);
-    } catch (Exception $e) {
-        echo "Error running command: " . $e->getMessage() . "\n";
-    }
-
-    $application->run($input, $output);
-
-    return $output->fetch();
 }
 
 function git_clone($repo, $dir)
