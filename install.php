@@ -55,7 +55,7 @@ shell_exec("./autogen.sh; ./configure; make; make install");
 $ssdp_conf = new stdClass();
 $ssdp_conf->networkInterface = $NETWORK_INTERFACE;
 $ssdp_conf->descriptionUrl = "http://$IP:8000/Description.xml";
-file_put_contents("/home/clarion/ssdp-advertiser/ssdp-advertiser.conf", json_encode($ssdp_conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+file_put_contents("/etc/ssdp-advertiser.json", json_encode($ssdp_conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
 function get_network_interface()
 {
@@ -178,7 +178,11 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("DB_USERNAME", $db_user);
     $env->set("DB_PASSWORD", $db_pass);
     $env->set("APP_URL", $app_url);
+    $env->set("APP_KEY", "");
     $env->save();
+
+    shell_exec("php $backend_dir/artisan key:generate");
+    shell_exec("php $backend_dir/artisan migrate");
 }
 
 function install_multichain($version)
