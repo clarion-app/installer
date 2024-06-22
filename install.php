@@ -7,6 +7,9 @@ $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/home/clarion/frontend-framework";
 $MAC = get_mac();
 $IP = get_ip();
+
+print "IP: $IP\n";
+exit();
 $DB_NAME = "clarion";
 $DB_USER = "clarion";
 $DB_PASS = generate_password(12);
@@ -55,8 +58,10 @@ function get_ip()
         if(!isset($parts[1])) return null;
         $iface = str_replace(':', '', $parts[1]);
         if($iface == 'lo') return null;
-        if(!isset($parts[3])) return null;
-        return $parts[3];
+	    if($parts[5] != "inet") return null;
+        if(!isset($parts[6])) return null;
+	    $ip_parts = explode('/', $parts[6]);
+        return $ip_parts[0];
     };
 
     $ips = array_values(array_filter(array_map($func, $lines)));
