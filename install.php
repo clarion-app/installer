@@ -107,7 +107,7 @@ function create_laravel_project($dir)
             'url' => '../backend'
         ]
     ];
-    file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT));
+    file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
     shell_exec("composer require clarion-app/backend:dev-main -q --working-dir=$dir");
     $pwd = getcwd();
@@ -178,6 +178,6 @@ EOF;
     $apacheConf = preg_replace("/User www-data/", "User clarion", $apacheConf);
     $apacheConf = preg_replace("/Group www-data/", "Group clarion", $apacheConf);
     file_put_contents("/etc/apache2/apache2.conf", $apacheConf);
-    
+
     shell_exec("systemctl restart apache2");
 }
