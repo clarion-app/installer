@@ -6,6 +6,7 @@ use ClarionApp\Installer\EnvEditor;
 $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/home/clarion/frontend-framework";
 $MAC = get_mac();
+$IP = get_ip_from_mac();
 $DB_NAME = "clarion";
 $DB_USER = "clarion";
 $DB_PASS = generate_password(12);
@@ -17,7 +18,7 @@ $MULTICHAIN_VERSION = "2.3.3";
 
 $APT_PACKAGES = "screen git php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql wget tar curl ssh ";
 $APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev libcurl4-openssl-dev libpugixml-dev ";
-$APT_PACKAGES.= "libsystemd-dev vim screen php-cli";
+$APT_PACKAGES.= "libsystemd-dev vim screen php-cli docker.io";
 $HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
 
 print "Changing hostname to $HOSTNAME\n";
@@ -40,10 +41,25 @@ print "Creating Laravel project in $BACKEND_DIR\n";
 create_laravel_project($BACKEND_DIR);
 
 print "Configuring Laravel\n";
-configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS);
+configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000");
 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
+
+function get_ip_from_mac()
+{
+    $mac = get_mac();
+    $lines = explode("\n", shell_exec("arp -a"));
+    $func = function($line) use ($mac)
+    {
+        $parts = preg_split('/\s+/', $line);
+        if($parts[2] == $mac) return $parts[1];
+        return null;
+    };
+
+    $ips = array_values(array_filter(array_map($func, $lines)));
+    return $ips[0];
+}
 
 function get_mac()
 {
@@ -121,7 +137,7 @@ function create_laravel_project($dir)
     shell_exec("chown -R www-data:www-data $dir");
 }
 
-function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $db_user, $db_pass)
+function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $db_user, $db_pass, $app_url)
 {
     $env = new EnvEditor("$backend_dir/.env");
     $env->set("DB_CONNECTION", "mysql");
@@ -130,6 +146,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("DB_DATABASE", $db_name);
     $env->set("DB_USERNAME", $db_user);
     $env->set("DB_PASSWORD", $db_pass);
+    $env->set("APP_URL", $app_url);
     $env->save();
 }
 
