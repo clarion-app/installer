@@ -94,7 +94,7 @@ function setup_mysql($db_name, $db_user, $db_pass, $db_host)
 
 function create_laravel_project($dir)
 {
-    shell_exec("composer create-project -q --prefer-dist laravel/laravel $dir");
+    shell_exec("composer create-project -n --prefer-dist laravel/laravel $dir");
     print "Editing $dir/composer.json\n";
     $composerJson = json_decode(file_get_contents("$dir/composer.json"), true);
     $composerJson['minimum-stability'] = 'dev';
