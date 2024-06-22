@@ -19,7 +19,7 @@ $MULTICHAIN_VERSION = "2.3.3";
 
 $APT_PACKAGES = "screen git php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql wget tar curl ssh ";
 $APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev libcurl4-openssl-dev libpugixml-dev ";
-$APT_PACKAGES.= "libsystemd-dev vim screen php-cli docker.io";
+$APT_PACKAGES.= "libsystemd-dev vim screen php-cli";
 $HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
 
 print "Changing hostname to $HOSTNAME\n";
