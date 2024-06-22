@@ -42,6 +42,9 @@ create_laravel_project($BACKEND_DIR);
 print "Configuring Laravel\n";
 configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS);
 
+print "Configuring Apache for backend\n";
+configure_apache_backend($BACKEND_DIR);
+
 function get_mac()
 {
     $lines = explode("\n", shell_exec('ip -o link show'));
@@ -113,9 +116,10 @@ function create_laravel_project($dir)
     print "Installing passport\n";
     print shell_exec("php artisan passport:install --uuids");
     chdir($pwd);
+    shell_exec("chown -R clarion:clarion $dir");
 }
 
-function configure_laravel_project($backend_dir, $db_name, $db_user, $db_pass, $db_host, $db_port)
+function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $db_user, $db_pass)
 {
     $env = new EnvEditor("$backend_dir/.env");
     $env->set("DB_CONNECTION", "mysql");
@@ -145,4 +149,35 @@ function install_multichain($version)
 function git_clone($repo, $dir)
 {
     shell_exec("git clone $repo $dir");
+}
+
+function configure_apache_backend($backend_dir)
+{
+    $apacheConfig = <<<EOF
+<VirtualHost *:8000>
+    ServerName clarion-backend
+    DocumentRoot $backend_dir/public
+
+    <Directory $backend_dir/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOF;
+
+    file_put_contents("/etc/apache2/sites-available/clarion-backend.conf", $apacheConfig);
+    shell_exec("a2ensite clarion-backend");
+    shell_exec("a2enmod rewrite");
+
+    // Change Apache User and Group to clarion
+    $apacheConf = file_get_contents("/etc/apache2/apache2.conf");
+    $apacheConf = preg_replace("/User www-data/", "User clarion", $apacheConf);
+    $apacheConf = preg_replace("/Group www-data/", "Group clarion", $apacheConf);
+    file_put_contents("/etc/apache2/apache2.conf", $apacheConf);
+    
+    shell_exec("systemctl restart apache2");
 }
