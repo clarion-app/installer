@@ -54,8 +54,8 @@ function get_mac()
         if(!isset($parts[1])) return null;
         $iface = str_replace(':', '', $parts[1]);
         if($iface == 'lo') return null;
-        if(!isset($parts[21])) return null;
-        return $parts[21];
+        if(!isset($parts[19])) return null;
+        return $parts[19];
     };
 
     $macs = array_values(array_filter(array_map($func, $lines)));
