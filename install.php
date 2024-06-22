@@ -116,7 +116,7 @@ function create_laravel_project($dir)
     shell_exec("php artisan clarion:setup-node-id");
 
     print "Installing passport\n";
-    print shell_exec("php artisan -n -- passport:install --uuids");
+    print shell_exec("php artisan passport:install --uuids --no-interaction");
     chdir($pwd);
     shell_exec("chown -R www-data:www-data $dir");
 }
