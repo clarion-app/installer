@@ -7,6 +7,7 @@ $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/home/clarion/frontend-framework";
 $MAC = get_mac();
 $IP = get_ip();
+$NETWORK_INTERFACE = get_network_interface();
 $DB_NAME = "clarion";
 $DB_USER = "clarion";
 $DB_PASS = generate_password(12);
@@ -45,6 +46,32 @@ configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, 
 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
+
+print "Cloning ssdp-advertiser\n";
+git_clone("https://github.com/metaverse-systems/ssdp-advertiser.git", "/home/clarion/ssdp-advertiser");
+$pwd = getcwd();
+chdir("/home/clarion/ssdp-advertiser");
+shell_exec("./autogen.sh; ./configure; make; make install");
+$ssdp_conf = new stdClass();
+$ssdp_conf->networkInterface = $NETWORK_INTERFACE;
+$ssdp_conf->descriptionUrl = "http://$IP:8000/Description.xml";
+file_put_contents("/home/clarion/ssdp-advertiser/ssdp-advertiser.conf", json_encode($ssdp_conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+function get_network_interface()
+{
+    $lines = explode("\n", shell_exec('ip -o link show'));
+    $func = function($line)
+    {
+        $parts = explode(' ', $line);
+        if(!isset($parts[1])) return null;
+        $iface = str_replace(':', '', $parts[1]);
+        if($iface == 'lo') return null;
+        return $iface;
+    };
+
+    $ifaces = array_values(array_filter(array_map($func, $lines)));
+    return $ifaces[0];
+}
 
 function get_ip()
 {
