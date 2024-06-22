@@ -7,9 +7,6 @@ $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/home/clarion/frontend-framework";
 $MAC = get_mac();
 $IP = get_ip();
-
-print "IP: $IP\n";
-exit();
 $DB_NAME = "clarion";
 $DB_USER = "clarion";
 $DB_PASS = generate_password(12);
