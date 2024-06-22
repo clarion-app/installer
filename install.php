@@ -109,7 +109,9 @@ function create_laravel_project($dir)
     shell_exec("composer require clarion-app/backend:dev-main -q --working-dir=$dir");
     $pwd = getcwd();
     chdir($dir);
-    shell_exec("php artisan passport:install --uuids");
+
+    print "Installing passport\n";
+    print shell_exec("php artisan passport:install --uuids");
     chdir($pwd);
 }
 
