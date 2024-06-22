@@ -34,7 +34,7 @@ print "DB_HOST=$DB_HOST\n";
 setup_mysql($DB_NAME, $DB_USER, $DB_PASS, $DB_HOST);
 
 print "Cloning backend repo\n";
-git_clone("https://github.com/clarion-app/backend.git", "/home/clarion/backend");
+git_clone("https://github.com/clarion-app/backend.git", "/var/www/backend");
 
 print "Creating Laravel project in $BACKEND_DIR\n";
 create_laravel_project($BACKEND_DIR);
