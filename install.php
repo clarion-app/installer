@@ -6,7 +6,7 @@ use ClarionApp\Installer\EnvEditor;
 $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/home/clarion/frontend-framework";
 $MAC = get_mac();
-$IP = get_ip_from_mac();
+$IP = get_ip();
 $DB_NAME = "clarion";
 $DB_USER = "clarion";
 $DB_PASS = generate_password(12);
@@ -46,15 +46,17 @@ configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
 
-function get_ip_from_mac()
+function get_ip()
 {
-    $mac = get_mac();
-    $lines = explode("\n", shell_exec("arp -a"));
-    $func = function($line) use ($mac)
+    $lines = explode("\n", shell_exec('ip -o addr show'));
+    $func = function($line)
     {
-        $parts = preg_split('/\s+/', $line);
-        if($parts[2] == $mac) return $parts[1];
-        return null;
+        $parts = explode(' ', $line);
+        if(!isset($parts[1])) return null;
+        $iface = str_replace(':', '', $parts[1]);
+        if($iface == 'lo') return null;
+        if(!isset($parts[3])) return null;
+        return $parts[3];
     };
 
     $ips = array_values(array_filter(array_map($func, $lines)));
