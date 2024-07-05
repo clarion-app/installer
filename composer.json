@@ -14,5 +14,7 @@
         }
     ],
     "require": {
-    }
+        "clarion-app/supervisor-manager": "dev-main"
+    },
+    "minimum-stability": "dev"
 }

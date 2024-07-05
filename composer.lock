@@ -4,11 +4,56 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ffc0188f5d8a4f2d0a26d2ff5c56bac1",
-    "packages": [],
+    "content-hash": "00e063ec9976900928183ccfdce4257c",
+    "packages": [
+        {
+            "name": "clarion-app/supervisor-manager",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clarion-app/supervisor-manager.git",
+                "reference": "ca2e1dd696e21b65a140d9e376bf2bafd5f380ad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clarion-app/supervisor-manager/zipball/ca2e1dd696e21b65a140d9e376bf2bafd5f380ad",
+                "reference": "ca2e1dd696e21b65a140d9e376bf2bafd5f380ad",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "ClarionApp\\Backend\\SupervisorManagerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ClarionApp\\SupervisorManager\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Schwartz",
+                    "email": "tim@metaverse.systems"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/clarion-app/supervisor-manager/issues",
+                "source": "https://github.com/clarion-app/supervisor-manager/tree/main"
+            },
+            "time": "2024-07-05T05:44:25+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use ClarionApp\Installer\EnvEditor;
+use ClarionApp\SupervisorManager\SupervisorManager;
 
 $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/var/www/frontend-framework";
@@ -42,7 +43,7 @@ print "Creating Laravel project in $BACKEND_DIR\n";
 create_laravel_project($BACKEND_DIR);
 
 print "Configuring Laravel\n";
-configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000", "http://$IP");
+configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000", "http://$IP:5173");
 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
@@ -68,6 +69,21 @@ $ssdp_conf->descriptionUrl = "http://$IP:8000/Description.xml";
 file_put_contents("/etc/ssdp-advertiser.json", json_encode($ssdp_conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 shell_exec("systemctl enable ssdp-advertiser");
 shell_exec("systemctl start ssdp-advertiser");
+
+print "Setting up Supervisord\n";
+$sv_manager = new SupervisorManager();
+$sv_manager->createSupervisorConfig();
+$config = "[program:clarion-frontend]
+process_name=%(program_name)s_%(process_num)02d
+command=$FRONTEND_DIR/node_modules/.bin/npm run dev
+autostart=true
+autorestart=true
+user={www-data}
+numprocs={1}
+redirect_stderr=true
+stdout_logfile=/var/www/clarion-frontend.log";
+$sv_manager->createConfig("clarion-frontend", $config);
+$sv_manager->startSupervisord();
 
 function get_network_interface()
 {
