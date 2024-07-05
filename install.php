@@ -78,8 +78,8 @@ process_name=%(program_name)s_%(process_num)02d
 command=$FRONTEND_DIR/node_modules/.bin/npm run dev
 autostart=true
 autorestart=true
-user={www-data}
-numprocs={1}
+user= www-data
+numprocs= 1
 redirect_stderr=true
 stdout_logfile=/var/www/clarion-frontend.log";
 $sv_manager->createConfig("clarion-frontend", $config);
