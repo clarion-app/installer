@@ -84,6 +84,8 @@ stdout_logfile=/var/www/clarion-frontend.log";
 file_put_contents("/etc/supervisor/conf.d/clarion-frontend.conf", $config);
 shell_exec("supervisorctl reread; supervisorctl update;");
 
+shell_exec("chown -R www-data:www-data /var/www");
+
 function get_network_interface()
 {
     $lines = explode("\n", shell_exec('ip -o link show'));
