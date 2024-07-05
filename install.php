@@ -73,8 +73,8 @@ shell_exec("systemctl start ssdp-advertiser");
 print "Setting up Supervisord\n";
 $config = "[program:clarion-frontend]
 process_name=%(program_name)s_%(process_num)02d
-directory=$FRONTEND_DIR
-command=node_modules/.bin/npm run dev
+directory = $FRONTEND_DIR
+command = $FRONTEND_DIR/node_modules/.bin/npm run dev
 autostart=true
 autorestart=true
 user= www-data
