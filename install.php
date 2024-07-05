@@ -71,8 +71,6 @@ shell_exec("systemctl enable ssdp-advertiser");
 shell_exec("systemctl start ssdp-advertiser");
 
 print "Setting up Supervisord\n";
-$sv_manager = new SupervisorManager("/etc/supervisor");
-//$sv_manager->createSupervisorConfig();
 $config = "[program:clarion-frontend]
 process_name=%(program_name)s_%(process_num)02d
 directory=$FRONTEND_DIR
@@ -83,8 +81,8 @@ user= www-data
 numprocs= 1
 redirect_stderr=true
 stdout_logfile=/var/www/clarion-frontend.log";
-$sv_manager->createConfig("clarion-frontend", $config);
-$sv_manager->startSupervisord();
+file_put_contents("/etc/supervisor/conf.d/clarion-frontend.conf", $config);
+shell_exec("supervisorctl reread; supervisorctl update;");
 
 function get_network_interface()
 {
