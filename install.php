@@ -54,6 +54,9 @@ chdir($FRONTEND_DIR);
 shell_exec("npm install");
 shell_exec("npm run set-backend-url http://$IP:8000");
 
+print "Configuring Apache to proxy to frontend\n";
+configure_apache_frontend();
+
 print "Cloning ssdp-advertiser\n";
 git_clone("https://github.com/metaverse-systems/ssdp-advertiser.git", "/home/clarion/ssdp-advertiser");
 $pwd = getcwd();
@@ -240,6 +243,29 @@ EOF;
     $portsConf = file_get_contents("/etc/apache2/ports.conf");
     $portsConf.= "\nListen 8000\n";
     file_put_contents("/etc/apache2/ports.conf", $portsConf);
+
+    shell_exec("systemctl restart apache2");
+}
+
+function configure_apache_frontend()
+{
+    $apacheConfig = <<<EOF
+<VirtualHost *:80>
+    ServerName clarion-frontend
+
+    ProxyPreserveHost On
+    ProxyPass / http://localhost:5173/
+    ProxyPassReverse / http://localhost:5173/
+
+    ErrorLog \${APACHE_LOG_DIR}/frontend_error.log
+    CustomLog \${APACHE_LOG_DIR}/frontend_access.log combined
+</VirtualHost>
+EOF;
+
+    file_put_contents("/etc/apache2/sites-available/clarion-frontend.conf", $apacheConfig);
+    shell_exec("a2ensite clarion-frontend");
+    shell_exec("a2enmod proxy");
+    shell_exec("a2enmod proxy_http");
 
     shell_exec("systemctl restart apache2");
 }
