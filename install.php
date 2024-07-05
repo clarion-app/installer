@@ -4,7 +4,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use ClarionApp\Installer\EnvEditor;
 
 $BACKEND_DIR = "/var/www/backend-framework";
-$FRONTEND_DIR = "/home/clarion/frontend-framework";
+$FRONTEND_DIR = "/var/www/frontend-framework";
 $MAC = get_mac();
 $IP = get_ip();
 $NETWORK_INTERFACE = get_network_interface();
@@ -19,7 +19,7 @@ $MULTICHAIN_VERSION = "2.3.3";
 
 $APT_PACKAGES = "screen git php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql wget tar curl ssh ";
 $APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev libcurl4-openssl-dev libpugixml-dev ";
-$APT_PACKAGES.= "libsystemd-dev vim screen php-cli";
+$APT_PACKAGES.= "libsystemd-dev vim screen php-cli npm";
 $HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
 
 print "Changing hostname to $HOSTNAME\n";
@@ -46,6 +46,13 @@ configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, 
 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
+
+print "Configuring Vite for frontend\n";
+git_clone("https://github.com/clarion-app/frontend.git", $FRONTEND_DIR);
+$pwd = getcwd();
+chdir($FRONTEND_DIR);
+shell_exec("npm install");
+shell_exec("npm run set-backend-url http://$IP:8000");
 
 print "Cloning ssdp-advertiser\n";
 git_clone("https://github.com/metaverse-systems/ssdp-advertiser.git", "/home/clarion/ssdp-advertiser");
