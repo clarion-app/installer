@@ -42,7 +42,7 @@ print "Creating Laravel project in $BACKEND_DIR\n";
 create_laravel_project($BACKEND_DIR);
 
 print "Configuring Laravel\n";
-configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000");
+configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000", "http://$IP");
 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
@@ -180,7 +180,7 @@ function create_laravel_project($dir)
     shell_exec("chown -R www-data:www-data $dir");
 }
 
-function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $db_user, $db_pass, $app_url)
+function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $db_user, $db_pass, $app_url, $frontend_url)
 {
     $env = new EnvEditor("$backend_dir/.env");
     $env->set("DB_CONNECTION", "mysql");
@@ -190,6 +190,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("DB_USERNAME", $db_user);
     $env->set("DB_PASSWORD", $db_pass);
     $env->set("APP_URL", $app_url);
+    $env->set("FRONTEND_URL", $frontend_url);
     $env->set("APP_KEY", "");
     $env->save();
 
