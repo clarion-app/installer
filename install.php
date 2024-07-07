@@ -43,7 +43,7 @@ print "Creating Laravel project in $BACKEND_DIR\n";
 create_laravel_project($BACKEND_DIR);
 
 print "Configuring Laravel\n";
-configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000", "http://$IP:5173");
+configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASS, "http://$IP:8000", "http://$IP");
 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
