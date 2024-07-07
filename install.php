@@ -71,6 +71,9 @@ file_put_contents("/etc/ssdp-advertiser.json", json_encode($ssdp_conf, JSON_PRET
 shell_exec("systemctl enable ssdp-advertiser");
 shell_exec("systemctl start ssdp-advertiser");
 
+print "Setting www-data shell to /bin/bash\n";
+shell_exec("chsh -s /bin/bash www-data");
+
 print "Setting up Supervisord\n";
 $config = "[program:clarion-frontend]
 process_name=%(program_name)s_%(process_num)02d
@@ -78,7 +81,7 @@ directory = $FRONTEND_DIR
 command = $FRONTEND_DIR/node_modules/.bin/npm run dev
 autostart=true
 autorestart=true
-user = root
+user = www-data
 numprocs= 1
 redirect_stderr=true
 stdout_logfile=/var/www/clarion-frontend.log";
@@ -214,6 +217,13 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
 
     shell_exec("php $backend_dir/artisan key:generate");
     shell_exec("php $backend_dir/artisan migrate");
+    shell_exec("php $backend_dir/artisan vendor:publish --tag=clarion-config");
+    shell_exec("php $backend_dir/artisan vendor:publish --tag=emc-config");
+
+    // edit config/eloquent-multichain-bridge.php and set 'disabled' to true
+    $config = file_get_contents("$backend_dir/config/eloquent-multichain-bridge.php");
+    $config = str_replace("'disabled' => false", "'disabled' => true", $config);
+    file_put_contents("$backend_dir/config/eloquent-multichain-bridge.php", $config);
 }
 
 function install_multichain($version)
