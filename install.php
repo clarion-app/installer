@@ -2,7 +2,6 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use ClarionApp\Installer\EnvEditor;
-use ClarionApp\SupervisorManager\SupervisorManager;
 
 $BACKEND_DIR = "/var/www/backend-framework";
 $FRONTEND_DIR = "/var/www/frontend-framework";
