@@ -272,7 +272,7 @@ function configure_apache_frontend()
     
     // Remove port 80 from ports.conf
     $portsConf = file_get_contents("/etc/apache2/ports.conf");
-    $portsConf = preg_replace("/Listen 80/", "", $portsConf);
+    $portsConf = str_replace("Listen 80\n", "", $portsConf);
     file_put_contents("/etc/apache2/ports.conf", $portsConf);
     
     shell_exec("systemctl restart apache2");
