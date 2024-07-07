@@ -74,6 +74,9 @@ shell_exec("systemctl start ssdp-advertiser");
 print "Setting www-data shell to /bin/bash\n";
 shell_exec("chsh -s /bin/bash www-data");
 
+print "Allowing node to bind to port 80\n";
+shell_exec("setcap 'cap_net_bind_service=+ep' $(readlink -f $(which node))");
+
 print "Setting up Supervisord\n";
 $config = "[program:clarion-frontend]
 process_name=%(program_name)s_%(process_num)02d
