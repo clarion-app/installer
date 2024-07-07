@@ -281,6 +281,7 @@ function configure_apache_frontend()
 EOF;
 
     file_put_contents("/etc/apache2/sites-available/clarion-frontend.conf", $apacheConfig);
+    shell_exec("a2dissite 000-default");
     shell_exec("a2ensite clarion-frontend");
     shell_exec("a2enmod proxy");
     shell_exec("a2enmod proxy_http");
