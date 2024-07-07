@@ -92,6 +92,26 @@ shell_exec("supervisorctl reread; supervisorctl update;");
 
 shell_exec("chown -R www-data:www-data /var/www");
 
+print "Setup www-data's crontab to run php artisan schedule:run every minute\n";
+shell_exec("crontab -l > /tmp/crontab");
+shell_exec("echo '* * * * * cd /var/www/backend-framework && php artisan schedule:run >> /dev/null 2>&1' >> /tmp/crontab");
+shell_exec("crontab /tmp/crontab");
+
+print "Setting up supervisor to run php artisan queue:work --queue=default\n";
+$config = "[program:clarion-queue]
+process_name=%(program_name)s_%(process_num)02d
+directory = $BACKEND_DIR
+command = php artisan queue:work --queue=default
+autostart=true
+autorestart=true
+user = www-data
+numprocs= 1
+redirect_stderr=true
+stdout_logfile=/var/www/clarion-queue.log";
+file_put_contents("/etc/supervisor/conf.d/clarion-queue.conf", $config);
+shell_exec("supervisorctl reread; supervisorctl update;");
+shell_exec("supervisorctl start clarion-queue");
+
 function get_network_interface()
 {
     $lines = explode("\n", shell_exec('ip -o link show'));
