@@ -17,7 +17,7 @@ $MULTICHAIN_VERSION = "2.3.3";
 
 /* Don't edit below this line */
 
-$APT_PACKAGES = "screen git php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql wget tar curl ssh ";
+$APT_PACKAGES = "screen git php-mbstring php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql wget tar curl ssh ";
 $APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev libcurl4-openssl-dev libpugixml-dev ";
 $APT_PACKAGES.= "libsystemd-dev vim screen php-cli npm";
 $HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
@@ -116,7 +116,7 @@ print "Setting up supervisor to run php aristan reverb:start\n";
 $config = "[program:clarion-reverb]
 process_name=%(program_name)s_%(process_num)02d
 directory = $BACKEND_DIR
-command = php artisan reverb:start
+command = php artisan reverb:start --debug
 autostart=true
 autorestart=true
 user = www-data
