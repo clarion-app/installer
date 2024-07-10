@@ -125,6 +125,11 @@ redirect_stderr=true
 stdout_logfile=/var/www/clarion-reverb.log";
 file_put_contents("/etc/supervisor/conf.d/clarion-reverb.conf", $config);
 
+$supervisordConf = file_get_contents("/etc/supervisor/supervisord.conf");
+$supervisordConf.= "\nminfds=10000\n";
+file_put_contents("/etc/supervisor/supervisord.conf", $supervisordConf);
+
+
 shell_exec("supervisorctl reread; supervisorctl update;");
 shell_exec("supervisorctl start clarion-queue");
 
