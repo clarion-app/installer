@@ -47,6 +47,7 @@ configure_laravel_project($BACKEND_DIR, $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, 
 print "Configuring Apache for backend\n";
 configure_apache_backend($BACKEND_DIR);
 
+$env = new EnvEditor("$BACKEND_DIR/.env");
 print "Configuring Vite for frontend\n";
 git_clone("https://github.com/clarion-app/frontend.git", $FRONTEND_DIR);
 $pwd = getcwd();
@@ -54,6 +55,7 @@ chdir($FRONTEND_DIR);
 shell_exec("npm install");
 shell_exec("npm run set-backend-url http://$IP:8000");
 shell_exec("npm run set-port 80");
+shell_exec("npm run set-reverb-config $IP 8080 http ".$env->get("REVERB_APP_KEY"));
 
 print "Configuring Apache to proxy to frontend\n";
 configure_apache_frontend();
@@ -109,6 +111,20 @@ numprocs= 1
 redirect_stderr=true
 stdout_logfile=/var/www/clarion-queue.log";
 file_put_contents("/etc/supervisor/conf.d/clarion-queue.conf", $config);
+
+print "Setting up supervisor to run php aristan reverb:start\n";
+$config = "[program:clarion-reverb]
+process_name=%(program_name)s_%(process_num)02d
+directory = $BACKEND_DIR
+command = php artisan reverb:start
+autostart=true
+autorestart=true
+user = www-data
+numprocs= 1
+redirect_stderr=true
+stdout_logfile=/var/www/clarion-reverb.log";
+file_put_contents("/etc/supervisor/conf.d/clarion-reverb.conf", $config);
+
 shell_exec("supervisorctl reread; supervisorctl update;");
 shell_exec("supervisorctl start clarion-queue");
 
@@ -246,6 +262,8 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $config = file_get_contents("$backend_dir/config/eloquent-multichain-bridge.php");
     $config = str_replace("'disabled' => false", "'disabled' => true", $config);
     file_put_contents("$backend_dir/config/eloquent-multichain-bridge.php", $config);
+
+    shell_exec("php $backend_dir/artisan install:broadcasting -n");
 }
 
 function install_multichain($version)
