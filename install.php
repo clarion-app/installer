@@ -262,6 +262,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $config = file_get_contents("$backend_dir/config/eloquent-multichain-bridge.php");
     $config = str_replace("'disabled' => false", "'disabled' => true", $config);
     file_put_contents("$backend_dir/config/eloquent-multichain-bridge.php", $config);
+    shell_exec("chown -R www-data:www-data /var/www");
 
     shell_exec("php $backend_dir/artisan install:broadcasting -n");
 }
