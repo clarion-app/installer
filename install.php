@@ -277,6 +277,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     shell_exec("chown -R www-data:www-data /var/www");
 
     shell_exec("php $backend_dir/artisan install:broadcasting -n");
+    shell_exec("php $backend_dir/artisan vendor:publish --tag=reverb");
 }
 
 function install_multichain($version)
