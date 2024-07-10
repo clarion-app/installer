@@ -251,7 +251,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("APP_URL", $app_url);
     $env->set("FRONTEND_URL", $frontend_url);
     $env->set("APP_KEY", "");
-    $env->set("BROADCAST_CONNECTION=reverb");
+    $env->set("BROADCAST_CONNECTION", "reverb");
     $env->set("REVERB_APP_ID", generate_password(8));
     $env->set("REVERB_APP_KEY", generate_password(32));
     $env->set("REVERB_APP_SECRET", generate_password(32));
