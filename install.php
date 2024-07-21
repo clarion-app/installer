@@ -52,7 +52,7 @@ print "Configuring Vite for frontend\n";
 git_clone("https://github.com/clarion-app/frontend.git", $FRONTEND_DIR);
 $pwd = getcwd();
 chdir($FRONTEND_DIR);
-shell_exec("npm install");
+shell_exec("npm install --legacy-peer-deps");
 shell_exec("npm run set-backend-url http://$IP:8000");
 shell_exec("npm run set-port 80");
 shell_exec("npm run set-reverb-config $IP 8080 http ".$env->get("REVERB_APP_KEY"));
