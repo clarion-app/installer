@@ -237,9 +237,8 @@ function create_laravel_project($dir)
     chdir($dir);
 
     shell_exec("php artisan clarion:setup-node-id");
-
+    shell_exec("rm $dir/database/migrations/0001_01_01_000000_create_users_table.php");
     print "Installing passport\n";
-    shell_exec("composer require laravel/passport:^12.2 -q --working-dir=$dir");
     print shell_exec("php artisan passport:install --uuids --no-interaction");
     chdir($pwd);
     shell_exec("chown -R www-data:www-data $dir");
