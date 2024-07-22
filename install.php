@@ -239,6 +239,7 @@ function create_laravel_project($dir)
     shell_exec("php artisan clarion:setup-node-id");
 
     print "Installing passport\n";
+    shell_exec("composer require laravel/passport -q --working-dir=$dir");
     print shell_exec("php artisan passport:install --uuids --no-interaction");
     chdir($pwd);
     shell_exec("chown -R www-data:www-data $dir");
