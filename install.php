@@ -103,7 +103,7 @@ print "Setting up supervisor to run php artisan queue:work --queue=default\n";
 $config = "[program:clarion-queue]
 process_name=%(program_name)s_%(process_num)02d
 directory = $BACKEND_DIR
-command = php artisan queue:work --queue=default
+command = sleep 5 && php artisan queue:work --queue=default
 autostart=true
 autorestart=true
 user = www-data
