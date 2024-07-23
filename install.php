@@ -103,7 +103,7 @@ print "Setting up supervisor to run php artisan queue:work --queue=default\n";
 $config = "[program:clarion-queue]
 process_name=%(program_name)s_%(process_num)02d
 directory = $BACKEND_DIR
-command = sleep 5 && php artisan queue:work --queue=default
+command = php artisan queue:work --queue=default
 autostart=true
 autorestart=true
 user = www-data
@@ -131,6 +131,7 @@ file_put_contents("/etc/supervisor/supervisord.conf", $supervisordConf);
 
 
 shell_exec("supervisorctl reread; supervisorctl update;");
+sleep(5);
 shell_exec("supervisorctl start clarion-queue");
 
 function get_network_interface()
