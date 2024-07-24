@@ -50,7 +50,7 @@ configure_apache_backend($BACKEND_DIR);
 $env = new EnvEditor("$BACKEND_DIR/.env");
 print "Configuring Vite for frontend\n";
 git_clone("https://github.com/clarion-app/frontend.git", $FRONTEND_DIR);
-$pwd = getcwd();
+$cwd = getcwd();
 chdir($FRONTEND_DIR);
 shell_exec("npm install --legacy-peer-deps");
 shell_exec("npm run set-backend-url http://$IP:8000");
@@ -62,7 +62,7 @@ configure_apache_frontend();
 
 print "Cloning ssdp-advertiser\n";
 git_clone("https://github.com/metaverse-systems/ssdp-advertiser.git", "/home/clarion/ssdp-advertiser");
-$pwd = getcwd();
+$cwd = getcwd();
 chdir("/home/clarion/ssdp-advertiser");
 shell_exec("./autogen.sh; ./configure; make; make install");
 $ssdp_conf = new stdClass();
@@ -234,7 +234,7 @@ function create_laravel_project($dir)
     file_put_contents("$dir/composer.json", json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
     shell_exec("composer require clarion-app/backend:dev-main -q --working-dir=$dir");
-    $pwd = getcwd();
+    $cwd = getcwd();
     chdir($dir);
 
     shell_exec("php artisan clarion:setup-node-id");
@@ -242,10 +242,7 @@ function create_laravel_project($dir)
     print "Installing passport\n";
     print shell_exec("php artisan passport:install --uuids --no-interaction");
     print shell_exec("cp /var/www/backend/src/PassportMigrations/* $dir/database/migrations/");
-    print shell_exec("php artisan migrate");
-    print shell_exec("php artisan passport:client --password -n");
-    print shell_exec("php artisan passport:client --personal -n");
-    chdir($pwd);
+    chdir($cwd);
     shell_exec("chown -R www-data:www-data $dir");
 }
 
@@ -270,8 +267,14 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("REVERB_SCHEME", "http");
     $env->save();
 
+    $cwd = getcwd();
     shell_exec("php $backend_dir/artisan key:generate");
-    shell_exec("php $backend_dir/artisan migrate");
+    chdir($backend_dir);
+    print shell_exec("php artisan migrate");
+    print shell_exec("php artisan passport:client --password -n");
+    print shell_exec("php artisan passport:client --personal -n");
+    chdir($cwd);
+    
     shell_exec("php $backend_dir/artisan vendor:publish --tag=clarion-config");
     shell_exec("php $backend_dir/artisan vendor:publish --tag=emc-config");
 
