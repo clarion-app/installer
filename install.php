@@ -241,6 +241,10 @@ function create_laravel_project($dir)
     shell_exec("rm $dir/database/migrations/0001_01_01_000000_create_users_table.php");
     print "Installing passport\n";
     print shell_exec("php artisan passport:install --uuids --no-interaction");
+    print shell_exec("cp /var/www/backend/src/PassportMigrations/* $dir/database/migrations/");
+    print shell_exec("php artisan migrate");
+    print shell_exec("php artisan passport:client --password -n");
+    print shell_exec("php artisan passport:client --personal -n");
     chdir($pwd);
     shell_exec("chown -R www-data:www-data $dir");
 }
