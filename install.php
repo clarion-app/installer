@@ -57,7 +57,7 @@ shell_exec("npm run set-backend-url http://$IP:8000");
 shell_exec("npm run set-port 80");
 shell_exec("npm run set-reverb-config $IP 8080 http ".$env->get("REVERB_APP_KEY"));
 
-print "Configuring Apache to proxy to frontend\n";
+print "Stop Apache from listening to port 80\n";
 configure_apache_frontend();
 
 print "Cloning ssdp-advertiser\n";
