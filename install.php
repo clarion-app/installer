@@ -270,7 +270,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $cwd = getcwd();
     shell_exec("php $backend_dir/artisan key:generate");
     chdir($backend_dir);
-    $filenames = $date("Y_m_d")."_*.php";
+    $filenames = date("Y_m_d")."_*.php";
     print shell_exec("rm $backend_dir/database/migrations/$filenames");
     print shell_exec("php artisan session:table");
     print shell_exec("php artisan migrate");
