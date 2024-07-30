@@ -17,7 +17,7 @@ $MULTICHAIN_VERSION = "2.3.3";
 
 /* Don't edit below this line */
 
-$APT_PACKAGES = "screen git php-mbstring php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql php-zip wget tar curl ssh ";
+$APT_PACKAGES = "screen git php-mbstring php-xml php-curl unzip screen openssl jq mariadb-server php php-mysql php-zip php-sqlite wget tar curl ssh ";
 $APT_PACKAGES.= "supervisor autoconf automake build-essential libgssdp-1.6-dev libcurl4-openssl-dev libpugixml-dev ";
 $APT_PACKAGES.= "libsystemd-dev vim screen php-cli npm";
 $HOSTNAME = "clarion-".implode("", array_slice(explode(":", $MAC), 3, 3));
