@@ -75,6 +75,11 @@ shell_exec("systemctl start ssdp-advertiser");
 print "Setting www-data shell to /bin/bash\n";
 shell_exec("chsh -s /bin/bash www-data");
 
+print "Installing Multichain\n";
+install_multichain($MULTICHAIN_VERSION);
+shell_exec("mkdir /var/www/.multichain");
+shell_exec("chown -R www-data:www-data /var/www/.multichain");
+
 print "Allowing node to bind to port 80\n";
 shell_exec("setcap 'cap_net_bind_service=+ep' $(readlink -f $(which node))");
 
@@ -134,11 +139,6 @@ shell_exec("sudo chgrp -R www-data /etc/supervisor/conf.d");
 shell_exec("sudo chmod -R 775 /etc/supervisor/conf.d");
 shell_exec("sudo chmod g+s /etc/supervisor/conf.d");
 shell_exec("echo 'www-data ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl update' | sudo tee -a /etc/sudoers.d/www-data-supervisor");
-
-print "Installing Multichain\n";
-install_multichain($MULTICHAIN_VERSION);
-shell_exec("mkdir /var/www/.multichain");
-shell_exec("chown -R www-data:www-data /var/www/.multichain");
 
 shell_exec("supervisorctl reread; supervisorctl update;");
 sleep(5);
