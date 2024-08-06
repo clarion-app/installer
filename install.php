@@ -129,6 +129,12 @@ $supervisordConf = file_get_contents("/etc/supervisor/supervisord.conf");
 $supervisordConf.= "\nminfds=10000\n";
 file_put_contents("/etc/supervisor/supervisord.conf", $supervisordConf);
 
+print "Giving www-data permissions to run supervisor\n";
+shell_exec("sudo chgrp -R www-data /etc/supervisor/conf.d");
+shell_exec("sudo chmod -R 775 /etc/supervisor/conf.d");
+shell_exec("sudo chmod g+s /etc/supervisor/conf.d");
+shell_exec("echo 'www-data ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl update' | sudo tee -a /etc/sudoers.d/www-data-supervisor");
+
 print "Installing Multichain\n";
 install_multichain($MULTICHAIN_VERSION);
 
