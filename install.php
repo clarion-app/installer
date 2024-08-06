@@ -275,7 +275,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("REVERB_HOST", "localhost");
     $env->set("REVERB_PORT", "8080");
     $env->set("REVERB_SCHEME", "http");
-    $env->set("MULTICHAIN_RPC_HOST", get_ip());
+    $env->set("MULTICHAIN_RPC_HOST", "localhost");
     $env->save();
 
     $cwd = getcwd();
