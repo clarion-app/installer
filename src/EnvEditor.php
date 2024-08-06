@@ -14,11 +14,11 @@ class EnvEditor
         foreach($this->lines as $line)
         {
             $parts = explode("=", $line);
-            if(count($parts) == 2)
-            {
+            //if(count($parts) == 2)
+            //{
                 if($parts[0][0] == '#') continue;
                 $this->settings[$parts[0]] = $parts[1];
-            }
+            //}
         }
 
         $this->filename = $filename;
