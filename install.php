@@ -129,6 +129,8 @@ $supervisordConf = file_get_contents("/etc/supervisor/supervisord.conf");
 $supervisordConf.= "\nminfds=10000\n";
 file_put_contents("/etc/supervisor/supervisord.conf", $supervisordConf);
 
+print "Installing Multichain\n";
+install_multichain($MULTICHAIN_VERSION);
 
 shell_exec("supervisorctl reread; supervisorctl update;");
 sleep(5);
@@ -265,6 +267,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("REVERB_HOST", "localhost");
     $env->set("REVERB_PORT", "8080");
     $env->set("REVERB_SCHEME", "http");
+    $env->set("MULTICHAIN_RPC_HOST", get_ip());
     $env->save();
 
     $cwd = getcwd();
@@ -297,13 +300,7 @@ function install_multichain($version)
     shell_exec("wget $url");
     shell_exec("tar -xvzf multichain-$version.tar.gz");
     
-    if(!file_exists("/home/clarion/bin"))
-    {
-        mkdir("/home/clarion/bin", 0755, true);
-    }
-
-    // Copy multichaind multichain-cli multichain-util to /home/clarion/bin
-    shell_exec("cp multichain-$version/multichaind multichain-$version/multichain-cli multichain-$version/multichain-util /home/clarion/bin");
+    shell_exec("cp multichain-$version/multichaind multichain-$version/multichain-cli multichain-$version/multichain-util /usr/local/bin");
 }
 
 function git_clone($repo, $dir)
