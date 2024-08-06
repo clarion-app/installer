@@ -206,8 +206,8 @@ function generate_password($size)
 
 function install_apt_packages($packages)
 {
-    shell_exec("apt-get update");
-    shell_exec("apt-get install -y $packages");
+    print shell_exec("apt-get update");
+    print shell_exec("apt-get install -y $packages");
 }
 
 function change_hostname($hostname)
