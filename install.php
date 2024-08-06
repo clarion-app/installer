@@ -137,6 +137,8 @@ shell_exec("echo 'www-data ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl update' | 
 
 print "Installing Multichain\n";
 install_multichain($MULTICHAIN_VERSION);
+shell_exec("mkdir /var/www/.multichain");
+shell_exec("chown -R www-data:www-data /var/www/.multichain");
 
 shell_exec("supervisorctl reread; supervisorctl update;");
 sleep(5);
