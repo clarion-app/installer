@@ -285,6 +285,7 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     print shell_exec("rm $backend_dir/database/migrations/$filenames");
     print shell_exec("php artisan session:table");
     print shell_exec("php artisan migrate");
+    print shell_exec("php artisan key:generate");
     print shell_exec("php artisan passport:client --password -n");
     print shell_exec("php artisan passport:client --personal -n");
     chdir($cwd);
