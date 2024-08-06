@@ -267,7 +267,6 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->set("DB_PASSWORD", $db_pass);
     $env->set("APP_URL", $app_url);
     $env->set("FRONTEND_URL", $frontend_url);
-    $env->set("APP_KEY", "");
     $env->set("BROADCAST_CONNECTION", "reverb");
     $env->set("REVERB_APP_ID", generate_password(8));
     $env->set("REVERB_APP_KEY", generate_password(32));
@@ -279,13 +278,11 @@ function configure_laravel_project($backend_dir, $db_host, $db_port, $db_name, $
     $env->save();
 
     $cwd = getcwd();
-    shell_exec("php $backend_dir/artisan key:generate");
     chdir($backend_dir);
     $filenames = date("Y_m_d")."_*.php";
     print shell_exec("rm $backend_dir/database/migrations/$filenames");
     print shell_exec("php artisan session:table");
     print shell_exec("php artisan migrate");
-    print shell_exec("php artisan key:generate");
     print shell_exec("php artisan passport:client --password -n");
     print shell_exec("php artisan passport:client --personal -n");
     chdir($cwd);
